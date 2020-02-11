@@ -80,4 +80,10 @@ export class AppPage {
     console.log('Login Button Clicked')
 
   }
+
+  async logout(){
+    await browser.wait(EC.visibilityOf(element(by.xpath("/html/body/div/form/table/tbody/tr/td[3]/table/tbody/tr[2]/td/a[2]"))),40000,'Logout button did not appeared')
+    await element(by.xpath("/html/body/div/form/table/tbody/tr/td[3]/table/tbody/tr[2]/td/a[2]")).click();
+    console.log('User Logged out successfully');
+  }
 }

@@ -1,6 +1,6 @@
 import { AppPage } from "../pages/app.po";
 import {  Before, Given, Then, When, After, AfterAll, ScenarioResult } from "cucumber";
-//import { expect } from "chai";
+import { expect } from "chai";
 import { QueuePage } from '../pages/queue.po';
 import { browser, protractor, element, by } from 'protractor';
 import { RequestPage } from '../pages/request-page.po';
@@ -24,6 +24,9 @@ let page: AppPage;
 let queuepage: QueuePage;
 let requestPage: RequestPage;
 let sc: ScenarioResult;
+
+let chai = require('chai');
+var expect = chai.expect;
 
 Before(() => {
   page = new AppPage();
@@ -118,42 +121,52 @@ When("It should navigate to the SD request page for the given {string}", {timeou
 
 // step definations for disruption creation
 
-Given('Login to the Eops with {string} and {string} and Select the Service Delay Application', {timeout: 90 * 45000} , async (Username:string, Password:string)=> {
-    //await page.navigateTo();
+Given('Login to the Eops with {string} and {string} and Select the LSSI Data Compare Application', {timeout: 90 * 45000} , async (Username:string, Password:string)=> {
     await browser.waitForAngularEnabled(false);
     console.log(Username);
     console.log(Password);
     await browser.driver.get("http://ursa-ui-dev.app.wtcdev1.paas.fedex.com/ursaCompare/");
     console.log('Navigated to Login Page');
-  browser.driver.manage().window().maximize();
-  await page.login(Username,Password)
+    browser.driver.manage().window().maximize();
+    await page.login(Username,Password)
     await browser.sleep(5000);
-  //await page.utilService.waitForUrlChange("https://devsso.secure.fedex.com/L2/eShipmentGUI/MenuPage.iface");
-  await page.utilService.waitForUrlChange("https://devsso.secure.fedex.com/L1/eShipmentGUI/MenuPage.iface");
   
-  browser.wait(EC.visibilityOf(requestPage.getAllApp()),20000,'all app button did not appear')
-  // await requestPage.getAllApp().click();
-  await browser.actions().mouseMove(requestPage.getAllApp()).perform()
-  await browser.sleep(1000);
-  await browser.actions().mouseMove(requestPage.getRecentApp()).perform()
-  await browser.sleep(1000);
-  await browser.actions().mouseMove(requestPage.getAllApp()).perform()
-  // browser.wait(EC.visibilityOf(requestPage.getQuickNavigation()),8000,'Quick Navigation button did not appear')
-  // await requestPage.getAllApp().click();
-  console.log('Mouse hover on All Applications success')
-  browser.wait(EC.visibilityOf(requestPage.getAllAppServiceDisruption()),20000,'LSSI value did not appear')
-  await requestPage.getAllAppServiceDisruption().click();
-  console.log('Clicked on LSSI Data Compare Application')
-  /*
-  await browser.sleep(3000)
-  await browser.waitForAngularEnabled(true);
-  browser.ignoreSynchronization = false;
+    await page.utilService.waitForUrlChange("https://devsso.secure.fedex.com/L1/eShipmentGUI/MenuPage.iface");
+    await browser.sleep(5000);
+  
+    browser.wait(EC.visibilityOf(requestPage.getAllApp()),2000,'all app button did not appear')
 
-  await browser.sleep(3000)
-  await browser.wait(EC.visibilityOf(requestPage.getFirstRowViewButton()),3000,'First Row View Button did not appear')
-  await requestPage.getFirstRowViewButton().click();
+    await browser.actions().mouseMove(requestPage.getAllApp()).perform()
+    await browser.sleep(1000);
+    await browser.actions().mouseMove(requestPage.getScans()).perform()
+    await browser.sleep(1000);
+    await browser.actions().mouseMove(requestPage.getAllApp()).perform()
+
+  console.log('Mouse hover on All Applications success')
+  browser.wait(EC.visibilityOf(requestPage.getAllAppLSSIDataCompare()),20000,'LSSI value did not appear')
+  await requestPage.getAllAppLSSIDataCompare().click();
+  console.log('Clicked on LSSI Data Compare Application')
+  
+  // await browser.wait(EC.visibilityOf(element(by.linkText("Logout"))),20000,'Logout did not appeared')
+  // await element(by.linkText("Logout")).click();
+  // console.log('User Logged out successfully');
+
+
+  // Checking load complete and enable angular 
+  await page.utilService.waitForUrlChange("https://devsso.secure.fedex.com/L1/eShipmentGUI/DisplayLinkHandler?id=4002");
+  expect(await queuepage.getURL()).to.equal(queuepage.actualURL);
+  await browser.waitForAngularEnabled();
+  // Switching the frame to actual application 
+  await browser.switchTo().frame(element(by.xpath("//frame[@src='https://devsso.secure.fedex.com/ursaCompare/']")).getWebElement());
+
+  await browser.wait(EC.visibilityOf(requestPage.getRowViewButton(1)),20000,'First Row View Button did not appear')
+  //await browser.wait(EC.visibilityOf(element(by.css("#reportsList table tbody tr:nth-child(1) > td:nth-child(7) button"))),50000,'First Row View Button did not appear')
+  await requestPage.getRowViewButton(1).click();
+  //element(by.css("#reportsList table tbody tr:nth-child(1) > td:nth-child(7) button")).click();
   console.log('View Report Button Clicked')
-  */
+  await browser.sleep(5000)
+
+
 /*
   // Rel
   

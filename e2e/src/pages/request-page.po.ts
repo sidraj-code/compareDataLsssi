@@ -52,18 +52,22 @@ export class RequestPage {
   }
   getQuickNavigation = () => element(by.id("appNav"))
   getAllApp = () => element(by.xpath("//span[contains(text(),'All Applications')]"));
-  getRecentApp = () => element(by.xpath("//span[contains(text(),'Recently Accessed')]"));
+  //getRecentApp = () => element(by.xpath("//span[contains(text(),'Recently Accessed')]"));
+  getScans = () => element(by.xpath("//span[contains(text(),'Scans')]"));
 
   //dev
   // getAllAppServiceDisruption = ()=> element(by.xpath("//a[@id='j_id15:j_id22:0:j_id25:6:j_id27:j_id28:j_id29:link_3552:link']//span[@class='iceMnuItmLabel'][contains(text(),'ServiceDisruption')]"));
   getAllAppServiceDelay =()=> element(by.xpath("/html[1]/body[1]/div[1]/table[1]/tbody[1]/tr[2]/td[1]/table[1]/tbody[1]/tr[1]/td[1]/table[1]/tbody[1]/tr[1]/td[1]/form[1]/table[2]/tbody[1]/tr[1]/td[1]/div[1]/table[1]/tbody[1]/tr[2]/td[1]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[8]/div[1]/div[2]/div[14]/a[1]/span[1]"));
 
   //Rel
-  getAllAppServiceDisruption = () => element(by.xpath("//a[@id='j_id15:j_id22:0:j_id25:7:j_id27:j_id28:j_id29:link_4002:link']//span[@class='iceMnuItmLabel'][contains(text(),'LSSI Data Compare')]"));
+  getAllAppLSSIDataCompare = () => element(by.xpath("//a[@id='j_id15:j_id22:0:j_id25:7:j_id27:j_id28:j_id29:link_4002:link']//span[@class='iceMnuItmLabel'][contains(text(),'LSSI Data Compare')]"));
   //getAllAppServiceDelay =()=> element(by.xpath("//a[@id='j_id15:j_id22:0:j_id25:7:j_id27:j_id28:j_id29:link_3601:link']//span[@class='iceMnuItmLabel'][contains(text(),'ServiceDelay')]"))
 
-  getFirstRowViewButton =()=> element(by.xpath("//tr[1]//button//b[contains(text(),'View report')]"))
+  getUserID = (Username) => element(by.xpath("//a[contains(text(),'" + Username + "')]"));
 
+  getRowViewButton =(rowNumber)=> element(by.xpath("//tr['"+rowNumber+"']//td[7]//button[1]"))
+  //getFirstRowViewButon =()=> element(by.css("#reportsList table tbody tr:nth-child(1) > td:nth-child(7) button"))
+ 
   //effective date
   getEffectiveDate = () => element(by.xpath("//button[contains(text(),'Request New Disruption')]"));
 
