@@ -47,27 +47,55 @@ export class RequestPage {
     this.utilService = new Util();
   }
 
+
+
+  //Sidraj functions:
   getURL() {
     return browser.getCurrentUrl();
   }
   getQuickNavigation = () => element(by.id("appNav"))
   getAllApp = () => element(by.xpath("//span[contains(text(),'All Applications')]"));
-  //getRecentApp = () => element(by.xpath("//span[contains(text(),'Recently Accessed')]"));
   getScans = () => element(by.xpath("//span[contains(text(),'Scans')]"));
 
-  //dev
-  // getAllAppServiceDisruption = ()=> element(by.xpath("//a[@id='j_id15:j_id22:0:j_id25:6:j_id27:j_id28:j_id29:link_3552:link']//span[@class='iceMnuItmLabel'][contains(text(),'ServiceDisruption')]"));
-  getAllAppServiceDelay =()=> element(by.xpath("/html[1]/body[1]/div[1]/table[1]/tbody[1]/tr[2]/td[1]/table[1]/tbody[1]/tr[1]/td[1]/table[1]/tbody[1]/tr[1]/td[1]/form[1]/table[2]/tbody[1]/tr[1]/td[1]/div[1]/table[1]/tbody[1]/tr[2]/td[1]/div[1]/table[1]/tbody[1]/tr[1]/td[1]/div[1]/div[8]/div[1]/div[2]/div[14]/a[1]/span[1]"));
-
-  //Rel
   getAllAppLSSIDataCompare = () => element(by.xpath("//a[@id='j_id15:j_id22:0:j_id25:7:j_id27:j_id28:j_id29:link_4002:link']//span[@class='iceMnuItmLabel'][contains(text(),'LSSI Data Compare')]"));
-  //getAllAppServiceDelay =()=> element(by.xpath("//a[@id='j_id15:j_id22:0:j_id25:7:j_id27:j_id28:j_id29:link_3601:link']//span[@class='iceMnuItmLabel'][contains(text(),'ServiceDelay')]"))
 
   getUserID = (Username) => element(by.xpath("//a[contains(text(),'" + Username + "')]"));
 
-  getRowViewButton =(rowNumber)=> element(by.xpath("//tr['"+rowNumber+"']//td[7]//button[1]"))
-  //getFirstRowViewButon =()=> element(by.css("#reportsList table tbody tr:nth-child(1) > td:nth-child(7) button"))
- 
+  getRowViewButton =(rowNumber)=> element(by.xpath("//tr["+rowNumber+"]//td[7]//button[1]"));
+  
+  getRowElement = (compareType:string, rowNum:number, elmntNum:number)=> element(by.xpath("/html/body/app-root/app-layout/div/div/div[2]/app-version-comparison/app-"+compareType+"-comparison/div/p-table/div/div/table/tbody/tr["+rowNum+"]/td["+elmntNum+"]"));
+  
+  async doRowComparison(comparisonType) {
+    await browser.wait(browser.ExpectedConditions.visibilityOf(element(by.xpath("//span[contains(text(),'"+comparisonType+"')]"))),10000,'Location Compare did not appear');
+    await element(by.xpath("//span[contains(text(),'"+comparisonType+"')]")).click();
+    await browser.sleep(5000);
+    console.log(comparisonType+" :");
+    var cType = "location";
+    if (comparisonType != "Location Comparison") {
+      cType = (comparisonType == "USPS Comparison")? "usps":"zip";
+    }
+    console.log("cType: "+cType);
+    for (let j = 2; j <= 10; j=j+2){
+      for (let i = 2; i <= 4; i++) {
+        let str1 = await this.getRowElement(cType,j-1,i).getText();
+        await browser.sleep(1000);
+        let str2 = await this.getRowElement(cType,j,i).getText();
+        await browser.sleep(1000);
+        if (str1 != str2){
+          console.log("New Data: "+str2+" didn't match with Old Data: "+str1);
+          let colorr1 = await this.getRowElement(cType,j,i).getAttribute('style');
+          await browser.sleep(10000);
+          let colorr2 = "color: red;";
+          // console.log(colorr1);
+          // console.log(colorr2);
+          if (colorr1 != colorr2) { 
+            console.log("Bug!!!!  The data is not in Red color");
+          }
+        }
+      }
+    }
+  }
+
   //effective date
   getEffectiveDate = () => element(by.xpath("//button[contains(text(),'Request New Disruption')]"));
 

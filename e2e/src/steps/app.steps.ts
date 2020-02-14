@@ -7,6 +7,7 @@ import { RequestPage } from '../pages/request-page.po';
     //import {chaiAsPromised} from "chai-as-promised";
 
 import { async } from 'q';
+import { notEqual } from 'assert';
 
 /*
 let chai = require('chai');
@@ -32,6 +33,75 @@ Before(() => {
   page = new AppPage();
   queuepage=new QueuePage();
   requestPage = new RequestPage();
+});
+
+
+// step definations for LSSI Data Compare
+
+Given('Login to the Eops with {string} and {string} and Select the LSSI Data Compare Application', {timeout: 90 * 450000} , async (Username:string, Password:string)=> {
+    await browser.waitForAngularEnabled(false);
+    console.log(Username);
+    console.log(Password);
+    await browser.driver.get("http://ursa-ui-dev.app.wtcdev1.paas.fedex.com/ursaCompare/");
+    console.log('Navigated to Login Page');
+    browser.driver.manage().window().maximize();
+    await page.login(Username,Password)
+    await browser.sleep(5000);
+  
+    await page.utilService.waitForUrlChange("https://devsso.secure.fedex.com/L1/eShipmentGUI/MenuPage.iface");
+    await browser.sleep(5000);
+  
+    browser.wait(EC.visibilityOf(requestPage.getAllApp()),2000,'all app button did not appear')
+
+    await browser.actions().mouseMove(requestPage.getAllApp()).perform()
+    await browser.sleep(1000);
+    await browser.actions().mouseMove(requestPage.getScans()).perform()
+    await browser.sleep(1000);
+    await browser.actions().mouseMove(requestPage.getAllApp()).perform()
+
+    console.log('Mouse hover on All Applications success')
+    browser.wait(EC.visibilityOf(requestPage.getAllAppLSSIDataCompare()),20000,'LSSI value did not appear')
+    await requestPage.getAllAppLSSIDataCompare().click();
+    console.log('Clicked on LSSI Data Compare Application')
+
+    // await browser.wait(EC.visibilityOf(element(by.linkText("Logout"))),20000,'Logout did not appeared')
+    // await element(by.linkText("Logout")).click();
+    // console.log('User Logged out successfully');
+
+    // Checking load complete and enable angular 
+    await page.utilService.waitForUrlChange("https://devsso.secure.fedex.com/L1/eShipmentGUI/DisplayLinkHandler?id=4002");
+    expect(await queuepage.getURL()).to.equal(queuepage.actualURL);
+    await browser.waitForAngularEnabled();
+    // Switching the frame to actual application 
+    await browser.switchTo().frame(element(by.xpath("//frame[@src='https://devsso.secure.fedex.com/ursaCompare/']")).getWebElement());
+
+    var row = element.all(by.xpath('.//*[@class="ui-table-tbody"]'));
+    var value = row.all(by.tagName("tr"));
+    value.count().then(function(rowCount){
+      console.log("Row count: "+rowCount);
+    })
+    await browser.sleep(5000)
+    console.log("Just before outer For Loop");
+    for (var viewButton:number = 1; viewButton <= 4; viewButton++) {//4 buttons
+      console.log("Inside outer For Loop");
+      await browser.wait(EC.visibilityOf(requestPage.getRowViewButton(viewButton)),20000,'Row '+viewButton+' View Button did not appear')
+      await requestPage.getRowViewButton(viewButton).click();
+      console.log('View Report Button Clicked');
+      await browser.sleep(10000);
+
+      await requestPage.doRowComparison("Location Comparison");//28 rows, 35 elements for comparison
+      await browser.sleep(10000);
+      await requestPage.doRowComparison("USPS Comparison");//32 rows, 4 elements for comparison
+      await browser.sleep(10000);
+      await requestPage.doRowComparison("Zip Comparison");//28 rows, 56 elements for comparison
+      await browser.sleep(10000);
+
+      await browser.wait(EC.visibilityOf(element(by.tagName("b"))),10000,'Back to My reports did not appear');
+      await element(by.tagName("b")).click();
+      await browser.sleep(5000);
+    }
+
+  await browser.sleep(3000);
 });
 
 // After(async() => {
@@ -119,52 +189,7 @@ When("It should navigate to the SD request page for the given {string}", {timeou
 });
 */
 
-// step definations for disruption creation
 
-Given('Login to the Eops with {string} and {string} and Select the LSSI Data Compare Application', {timeout: 90 * 45000} , async (Username:string, Password:string)=> {
-    await browser.waitForAngularEnabled(false);
-    console.log(Username);
-    console.log(Password);
-    await browser.driver.get("http://ursa-ui-dev.app.wtcdev1.paas.fedex.com/ursaCompare/");
-    console.log('Navigated to Login Page');
-    browser.driver.manage().window().maximize();
-    await page.login(Username,Password)
-    await browser.sleep(5000);
-  
-    await page.utilService.waitForUrlChange("https://devsso.secure.fedex.com/L1/eShipmentGUI/MenuPage.iface");
-    await browser.sleep(5000);
-  
-    browser.wait(EC.visibilityOf(requestPage.getAllApp()),2000,'all app button did not appear')
-
-    await browser.actions().mouseMove(requestPage.getAllApp()).perform()
-    await browser.sleep(1000);
-    await browser.actions().mouseMove(requestPage.getScans()).perform()
-    await browser.sleep(1000);
-    await browser.actions().mouseMove(requestPage.getAllApp()).perform()
-
-  console.log('Mouse hover on All Applications success')
-  browser.wait(EC.visibilityOf(requestPage.getAllAppLSSIDataCompare()),20000,'LSSI value did not appear')
-  await requestPage.getAllAppLSSIDataCompare().click();
-  console.log('Clicked on LSSI Data Compare Application')
-  
-  // await browser.wait(EC.visibilityOf(element(by.linkText("Logout"))),20000,'Logout did not appeared')
-  // await element(by.linkText("Logout")).click();
-  // console.log('User Logged out successfully');
-
-
-  // Checking load complete and enable angular 
-  await page.utilService.waitForUrlChange("https://devsso.secure.fedex.com/L1/eShipmentGUI/DisplayLinkHandler?id=4002");
-  expect(await queuepage.getURL()).to.equal(queuepage.actualURL);
-  await browser.waitForAngularEnabled();
-  // Switching the frame to actual application 
-  await browser.switchTo().frame(element(by.xpath("//frame[@src='https://devsso.secure.fedex.com/ursaCompare/']")).getWebElement());
-
-  await browser.wait(EC.visibilityOf(requestPage.getRowViewButton(1)),20000,'First Row View Button did not appear')
-  //await browser.wait(EC.visibilityOf(element(by.css("#reportsList table tbody tr:nth-child(1) > td:nth-child(7) button"))),50000,'First Row View Button did not appear')
-  await requestPage.getRowViewButton(1).click();
-  //element(by.css("#reportsList table tbody tr:nth-child(1) > td:nth-child(7) button")).click();
-  console.log('View Report Button Clicked')
-  await browser.sleep(5000)
 
 
 /*
@@ -184,12 +209,15 @@ Given('Login to the Eops with {string} and {string} and Select the LSSI Data Com
   var until = protractor.ExpectedConditions;
   
   browser.wait(until.visibilityOf(queuepage.getCreateDisruptionButton()), 45000, 'Create Disruption Button did not appeared');
-*/
+
   // await queuepage.getCreateDisruptionButton().click();
   //await browser.wait(browser.ExpectedConditions.visibilityOf(element(by.xpath("//b[contains(text(),'SHOW FILTER')]"))),3000,'Region code dropdown value did not appeared')
   //expect(element(by.xpath("//b[contains(text(),'SHOW FILTER')]")).isPresent()).to.eventually.equal(true)
   //await browser.wait(browser.ExpectedConditions.visibilityOf(element(by.xpath("//button[@class='btn fedex-btn-new-request']"))),25000,'Work Queue row did not appear')
-});
+*/
+
+
+
 
 /*
 Given("Valid user login with {string} and {string}", {timeout: 90 * 3000}, async (username:string, password:string) => {
