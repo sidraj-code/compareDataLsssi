@@ -96,6 +96,70 @@ export class RequestPage {
     }
   }
 
+  getVer =(getVer)=> element(by.xpath("/html/body/app-root/app-layout/div/div/div[2]/app-reports-table/app-version-selection/p-dialog/div/div[2]/div/div["+getVer+"]/p-dropdown/div/div[3]/label"));
+
+  selVer =(selVer)=> element(by.xpath("/html/body/div[2]/div/ul/p-dropdownitem["+selVer+"]/li"));
+  
+  getVerEnv =()=> element(by.xpath("/html/body/div[2]/div[1]/input"));
+
+  selVerEnv =()=> element(by.xpath("/html/body/div[2]/div[2]/ul/p-dropdownitem[1]/li"));
+  
+  async createNewReport(oldVer, oldVerEnv, newVer, newVerEnv, operation) {
+    await browser.wait(EC.visibilityOf(element(by.xpath("//button[@id='createNewReport']"))),20000,'Row '+1+' Create New Report button did not appear')
+    await element(by.xpath("//button[@id='createNewReport']")).click();
+    await browser.sleep(3000);
+    //select Old Version
+    await browser.wait(browser.ExpectedConditions.visibilityOf(this.getVer(1)),10000,'Old Version did not appear');				
+    await this.getVer(1).click();
+    await browser.sleep(2000);
+    var verType = 1;
+    if (oldVer != "L2")
+    verType = (oldVer == "L3")? 2:3;
+    await browser.wait(browser.ExpectedConditions.visibilityOf(this.selVer(verType)),10000,'Old Version did not appear');				
+    await this.selVer(verType).click();
+    await browser.sleep(2000);
+    //select Old Version Environment
+    await browser.wait(browser.ExpectedConditions.visibilityOf(this.getVer(2)),10000,'Old Version did not appear');				
+    await this.getVer(2).click();
+    await browser.sleep(2000);
+    await browser.wait(EC.visibilityOf(this.getVerEnv()),9000,'Version Env did not appeared')
+    await this.getVerEnv().sendKeys(oldVerEnv);
+    await browser.wait(browser.ExpectedConditions.visibilityOf(this.selVerEnv()),10000,'Old Version Env did not appear');				
+    await this.selVerEnv().click();
+    await browser.sleep(2000);
+
+    //select New Version
+    await browser.wait(browser.ExpectedConditions.visibilityOf(this.getVer(3)),10000,'New Version did not appear');				
+    await this.getVer(3).click();
+    await browser.sleep(2000);
+    var verType = 1;
+    if (newVer != "L2")
+    verType = (newVer == "L3")? 2:3;
+    await browser.wait(browser.ExpectedConditions.visibilityOf(this.selVer(verType)),10000,'New Version did not appear');				
+    await this.selVer(verType).click();
+    await browser.sleep(2000);
+    //select New Version Environment
+    await browser.wait(browser.ExpectedConditions.visibilityOf(this.getVer(4)),10000,'New Version did not appear');				
+    await this.getVer(4).click();
+    await browser.sleep(2000);
+    await browser.wait(EC.visibilityOf(this.getVerEnv()),9000,'Version Env did not appeared')
+    await this.getVerEnv().sendKeys(newVerEnv);
+    await browser.wait(browser.ExpectedConditions.visibilityOf(this.selVerEnv()),10000,'New Version Env did not appear');				
+    await this.selVerEnv().click();
+    await browser.sleep(2000);
+
+    if (operation == "create"){
+      await browser.sleep(2000);
+      await browser.wait(EC.visibilityOf(element(by.xpath("//button[@id='createReport']"))),20000,'Row '+1+' Create New Report button did not appear')
+      await element(by.xpath("//button[@id='createReport']")).click();
+    } else {
+      await browser.sleep(2000);
+      await browser.wait(EC.visibilityOf(element(by.xpath("//button[@id='cancel']"))),20000,'Row '+1+' Create New Report button did not appear')
+      await element(by.xpath("//button[@id='cancel']")).click();
+    }
+    await browser.sleep(2000);
+  }
+
   //effective date
   getEffectiveDate = () => element(by.xpath("//button[contains(text(),'Request New Disruption')]"));
 

@@ -75,6 +75,8 @@ Given('Login to the Eops with {string} and {string} and Select the LSSI Data Com
     // Switching the frame to actual application 
     await browser.switchTo().frame(element(by.xpath("//frame[@src='https://devsso.secure.fedex.com/ursaCompare/']")).getWebElement());
 
+    // ViewReport Button test scenario
+  /*
     var row = element.all(by.xpath('.//*[@class="ui-table-tbody"]'));
     var value = row.all(by.tagName("tr"));
     value.count().then(function(rowCount){
@@ -100,8 +102,30 @@ Given('Login to the Eops with {string} and {string} and Select the LSSI Data Com
       await element(by.tagName("b")).click();
       await browser.sleep(5000);
     }
+*/
+  // Export to Excel test scenario
+/*
+  await browser.wait(EC.visibilityOf(requestPage.getRowViewButton(1)),20000,'Row '+1+' View Button did not appear')
+  await requestPage.getRowViewButton(1).click();
+  console.log('View Report Button Clicked');
+  await browser.sleep(10000);
+  await browser.wait(EC.visibilityOf(element(by.xpath("//a[@id='export']"))),20000,'Row '+1+' Export to Excel option did not appear')
+  await element(by.xpath("//a[@id='export']")).click();
+  await browser.sleep(5000);
+  await browser.wait(EC.visibilityOf(element(by.tagName("b"))),10000,'Back to My reports did not appear');
+  await element(by.tagName("b")).click();
+*/
+  // Create New Report test scenario
+await browser.sleep(10000);
 
-  await browser.sleep(3000);
+// await requestPage.createNewReport("Production", "FNL", "L3", "INT", "cancel");
+// await requestPage.createNewReport("L2", "FNL", "L3", "INT", "cancel");
+// await requestPage.createNewReport("L3", "FNL", "Production", "INT", "cancel");
+// await requestPage.createNewReport("L3", "FNL", "L2", "INT", "cancel");
+
+await requestPage.createNewReport("L3", "INT", "Production", "FNL", "create");
+
+await browser.sleep(5000);
 });
 
 // After(async() => {
