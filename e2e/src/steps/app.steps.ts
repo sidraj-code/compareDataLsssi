@@ -59,21 +59,62 @@ Given('Login to the Eops with {string} and {string} and Select the LSSI Data Com
     await browser.sleep(1000);
     await browser.actions().mouseMove(requestPage.getAllApp()).perform()
 
-    console.log('Mouse hover on All Applications success')
-    browser.wait(EC.visibilityOf(requestPage.getAllAppLSSIDataCompare()),20000,'LSSI value did not appear')
-    await requestPage.getAllAppLSSIDataCompare().click();
-    console.log('Clicked on LSSI Data Compare Application')
+    //Verify whether User is Allowed to access LSSI Data Compare Application
+    let msgFlag = await requestPage.getAllAppLSSIDataCompare().isPresent();
+    console.log("return value: "+msgFlag);
+    if (!msgFlag){
+      console.log("The user ID: "+Username+" is NOT Allowed to access LSSI Data Compare application as expected");
+      return process.exit(1);
+    } else {
+      console.log("The user ID: "+Username+" is ALLOWED to access LSSI Data Compare application as expected");
+      browser.wait(EC.visibilityOf(requestPage.getAllAppLSSIDataCompare()),20000,'LSSI value did not appear')
+      await requestPage.getAllAppLSSIDataCompare().click();
+      console.log('Clicked on LSSI Data Compare Application');
+      await browser.sleep(10000);
+    }
 
-    // await browser.wait(EC.visibilityOf(element(by.linkText("Logout"))),20000,'Logout did not appeared')
-    // await element(by.linkText("Logout")).click();
-    // console.log('User Logged out successfully');
 
-    // Checking load complete and enable angular 
+  
+    // Checking load complete
     await page.utilService.waitForUrlChange("https://devsso.secure.fedex.com/L1/eShipmentGUI/DisplayLinkHandler?id=4002");
     expect(await queuepage.getURL()).to.equal(queuepage.actualURL);
-    await browser.waitForAngularEnabled();
+    await browser.sleep(2000);
+
+    // Switching the frame to Header
+    await browser.switchTo().frame(element(by.xpath("//frame[@src='DisplayLinkHeader.jsp?id=4002']")).getWebElement());
+
+    // Verifying the Title of the page
+    await browser.wait(EC.visibilityOf(element(by.xpath("//label[@id='headerTitle']"))),10000,'Tile did not appear');
+    let strTitle = await element(by.xpath("//label[contains(text(),'LSSI Data Compare')]")).getText();
+    if (strTitle == "LSSI Data Compare") {
+      console.log("The Tile of the page is correct as expected");
+    } else {
+      console.log("The Tile of the page is incorrect");
+    }
+
+    // Verifying the Logged in User ID is correct
+    await browser.wait(EC.visibilityOf(element(by.xpath("/html/body/div/form/table/tbody/tr/td[3]/table/tbody/tr[1]/td/label"))),10000,'Tile did not appear');
+    let usrID = await element(by.xpath("/html/body/div/form/table/tbody/tr/td[3]/table/tbody/tr[1]/td/label")).getText();    
+    if (usrID.search(Username) == -1 ) { 
+      console.log("Not logged in with user ID 3797361" ); 
+    } else { 
+      console.log("Logged in with user ID 3797361 as expected " ); 
+    } 
+
+    //Verifying the Logout functionality is working as expected
+    await browser.wait(EC.visibilityOf(element(by.linkText("Logout"))),20000,'Logout did not appeared')
+    await element(by.linkText("Logout")).click();
+    browser.sleep(10000);
+    console.log('User Logged out successfully');
+
+
+
+
+    // Enable the Angular property
+    // await browser.waitForAngularEnabled();
+
     // Switching the frame to actual application 
-    await browser.switchTo().frame(element(by.xpath("//frame[@src='https://devsso.secure.fedex.com/ursaCompare/']")).getWebElement());
+    // await browser.switchTo().frame(element(by.xpath("//frame[@src='https://devsso.secure.fedex.com/ursaCompare/']")).getWebElement());
 
     // ViewReport Button test scenario
   /*
@@ -116,16 +157,21 @@ Given('Login to the Eops with {string} and {string} and Select the LSSI Data Com
   await element(by.tagName("b")).click();
 */
   // Create New Report test scenario
-await browser.sleep(10000);
+// await browser.sleep(10000);
 
 // await requestPage.createNewReport("Production", "FNL", "L3", "INT", "cancel");
 // await requestPage.createNewReport("L2", "FNL", "L3", "INT", "cancel");
 // await requestPage.createNewReport("L3", "FNL", "Production", "INT", "cancel");
 // await requestPage.createNewReport("L3", "FNL", "L2", "INT", "cancel");
 
-await requestPage.createNewReport("L3", "INT", "Production", "FNL", "create");
+// await requestPage.createNewReport("L3", "INT", "L3", "FNL", "create");
+// await requestPage.createNewReport("L2", "FNL", "L3", "FNL", "create");
+// await requestPage.createNewReport("L2", "FNL", "L3", "INT", "create");
+// await requestPage.createNewReport("L2", "INT", "L3", "FNL", "create");
+// await requestPage.createNewReport("L2", "INT", "L3", "INT", "create");
 
-await browser.sleep(5000);
+// await browser.sleep(10000);
+
 });
 
 // After(async() => {
