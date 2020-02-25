@@ -67,15 +67,15 @@ export class AppPage {
   }
 
   async login(username,password){
-    await browser.wait(EC.visibilityOf(this.getUserName()),9000,'Username did not appeared')
+    await browser.wait(EC.visibilityOf(this.getUserName()),20000,'Username did not appeared')
     await this.getUserName().sendKeys(username);
     console.log('Username entered')
      
-    await browser.wait(EC.visibilityOf(this.getPassword()),5000,'Password did not appeared')
+    await browser.wait(EC.visibilityOf(this.getPassword()),10000,'Password did not appeared')
     await this.getPassword().sendKeys(password);
     console.log('Password entered')
 
-    await browser.wait(EC.elementToBeClickable(this.getSignInButton()),2000,'SignIn button did not appeared')
+    await browser.wait(EC.elementToBeClickable(this.getSignInButton()),10000,'SignIn button did not appeared')
     await this.getSignInButton().click();
     console.log('Login Button Clicked')
 

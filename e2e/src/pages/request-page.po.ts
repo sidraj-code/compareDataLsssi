@@ -57,7 +57,7 @@ export class RequestPage {
   getAllApp = () => element(by.xpath("//span[contains(text(),'All Applications')]"));
   getScans = () => element(by.xpath("//span[contains(text(),'Scans')]"));
 
-  getAllAppLSSIDataCompare = () => element(by.xpath("//a[@id='j_id15:j_id22:0:j_id25:7:j_id27:j_id28:j_id29:link_4002:link']//span[@class='iceMnuItmLabel'][contains(text(),'LSSI Data Compare')]"));
+  getAllAppLSSIDataCompare = () => element(by.xpath("//a[@id='j_id15:j_id22:0:j_id25:6:j_id27:j_id28:j_id29:link_4002:link']//span[@class='iceMnuItmLabel'][contains(text(),'LSSI Data Compare')]"));
 
   getUserID = (Username) => element(by.xpath("//a[contains(text(),'" + Username + "')]"));
 
@@ -68,13 +68,13 @@ export class RequestPage {
   async doRowComparison(comparisonType) {
     await browser.wait(browser.ExpectedConditions.visibilityOf(element(by.xpath("//span[contains(text(),'"+comparisonType+"')]"))),10000,'Location Compare did not appear');
     await element(by.xpath("//span[contains(text(),'"+comparisonType+"')]")).click();
-    await browser.sleep(5000);
+    await browser.sleep(20000);
     console.log(comparisonType+" :");
     var cType = "location";
     if (comparisonType != "Location Comparison") {
       cType = (comparisonType == "USPS Comparison")? "usps":"zip";
     }
-    console.log("cType: "+cType);
+    // console.log("cType: "+cType);
     for (let j = 2; j <= 10; j=j+2){
       for (let i = 2; i <= 4; i++) {
         let str1 = await this.getRowElement(cType,j-1,i).getText();
@@ -107,7 +107,7 @@ export class RequestPage {
   saveReport =()=> element(by.xpath("//button[@id='saveReport']"));
 
   async createNewReport(oldVer, oldVerEnv, newVer, newVerEnv, operation) {
-    await browser.wait(EC.visibilityOf(element(by.xpath("//button[@id='createNewReport']"))),20000,'Row '+1+' Create New Report button did not appear')
+    await browser.wait(EC.visibilityOf(element(by.xpath("//button[@id='createNewReport']"))),20000,'Create New Report button did not appear')
     await element(by.xpath("//button[@id='createNewReport']")).click();
     await browser.sleep(1000);
     //select Old Version

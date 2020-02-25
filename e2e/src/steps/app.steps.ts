@@ -35,23 +35,22 @@ Before(() => {
   requestPage = new RequestPage();
 });
 
-
 // step definations for LSSI Data Compare
-
+// Login scenario with valid credentials
 Given('Login to the Eops with {string} and {string} and Select the LSSI Data Compare Application', {timeout: 90 * 450000} , async (Username:string, Password:string)=> {
+    console.log("******** Validating Login with valid credntials ********");
+
     await browser.waitForAngularEnabled(false);
-    console.log(Username);
-    console.log(Password);
-    await browser.driver.get("http://ursa-ui-dev.app.wtcdev1.paas.fedex.com/ursaCompare/");
+    await browser.driver.get("https://devsso.secure.fedex.com/L1/eShipmentGUI");
     console.log('Navigated to Login Page');
     browser.driver.manage().window().maximize();
     await page.login(Username,Password)
     await browser.sleep(5000);
-  
+  /*
     await page.utilService.waitForUrlChange("https://devsso.secure.fedex.com/L1/eShipmentGUI/MenuPage.iface");
     await browser.sleep(5000);
   
-    browser.wait(EC.visibilityOf(requestPage.getAllApp()),2000,'all app button did not appear')
+    browser.wait(EC.visibilityOf(requestPage.getAllApp()),50000,'all app button did not appear')
 
     await browser.actions().mouseMove(requestPage.getAllApp()).perform()
     await browser.sleep(1000);
@@ -61,20 +60,15 @@ Given('Login to the Eops with {string} and {string} and Select the LSSI Data Com
 
     //Verify whether User is Allowed to access LSSI Data Compare Application
     let msgFlag = await requestPage.getAllAppLSSIDataCompare().isPresent();
-    console.log("return value: "+msgFlag);
-    if (!msgFlag){
-      console.log("The user ID: "+Username+" is NOT Allowed to access LSSI Data Compare application as expected");
-      return process.exit(1);
-    } else {
+    // console.log("return value: "+msgFlag);
+    if (msgFlag){
       console.log("The user ID: "+Username+" is ALLOWED to access LSSI Data Compare application as expected");
-      browser.wait(EC.visibilityOf(requestPage.getAllAppLSSIDataCompare()),20000,'LSSI value did not appear')
+      browser.wait(EC.visibilityOf(requestPage.getAllAppLSSIDataCompare()),50000,'LSSI value did not appear')
       await requestPage.getAllAppLSSIDataCompare().click();
       console.log('Clicked on LSSI Data Compare Application');
-      await browser.sleep(10000);
     }
+    await browser.sleep(10000);
 
-
-  
     // Checking load complete
     await page.utilService.waitForUrlChange("https://devsso.secure.fedex.com/L1/eShipmentGUI/DisplayLinkHandler?id=4002");
     expect(await queuepage.getURL()).to.equal(queuepage.actualURL);
@@ -84,7 +78,7 @@ Given('Login to the Eops with {string} and {string} and Select the LSSI Data Com
     await browser.switchTo().frame(element(by.xpath("//frame[@src='DisplayLinkHeader.jsp?id=4002']")).getWebElement());
 
     // Verifying the Title of the page
-    await browser.wait(EC.visibilityOf(element(by.xpath("//label[@id='headerTitle']"))),10000,'Tile did not appear');
+    await browser.wait(EC.visibilityOf(element(by.xpath("//label[@id='headerTitle']"))),50000,'Tile did not appear');
     let strTitle = await element(by.xpath("//label[contains(text(),'LSSI Data Compare')]")).getText();
     if (strTitle == "LSSI Data Compare") {
       console.log("The Tile of the page is correct as expected");
@@ -93,84 +87,181 @@ Given('Login to the Eops with {string} and {string} and Select the LSSI Data Com
     }
 
     // Verifying the Logged in User ID is correct
-    await browser.wait(EC.visibilityOf(element(by.xpath("/html/body/div/form/table/tbody/tr/td[3]/table/tbody/tr[1]/td/label"))),10000,'Tile did not appear');
+    await browser.wait(EC.visibilityOf(element(by.xpath("/html/body/div/form/table/tbody/tr/td[3]/table/tbody/tr[1]/td/label"))),50000,'Tile did not appear');
     let usrID = await element(by.xpath("/html/body/div/form/table/tbody/tr/td[3]/table/tbody/tr[1]/td/label")).getText();    
     if (usrID.search(Username) == -1 ) { 
-      console.log("Not logged in with user ID 3797361" ); 
+      console.log("Not logged in with user ID "+Username); 
     } else { 
-      console.log("Logged in with user ID 3797361 as expected " ); 
+      console.log("Logged in with user ID "+Username+" as expected " ); 
     } 
 
     //Verifying the Logout functionality is working as expected
-    await browser.wait(EC.visibilityOf(element(by.linkText("Logout"))),20000,'Logout did not appeared')
+    await browser.wait(EC.visibilityOf(element(by.linkText("Logout"))),50000,'Logout did not appeared')
     await element(by.linkText("Logout")).click();
-    browser.sleep(10000);
+    browser.sleep(5000);
     console.log('User Logged out successfully');
-
-
-
-
-    // Enable the Angular property
-    // await browser.waitForAngularEnabled();
-
-    // Switching the frame to actual application 
-    // await browser.switchTo().frame(element(by.xpath("//frame[@src='https://devsso.secure.fedex.com/ursaCompare/']")).getWebElement());
-
-    // ViewReport Button test scenario
-  /*
-    var row = element.all(by.xpath('.//*[@class="ui-table-tbody"]'));
-    var value = row.all(by.tagName("tr"));
-    value.count().then(function(rowCount){
-      console.log("Row count: "+rowCount);
-    })
-    await browser.sleep(5000)
-    console.log("Just before outer For Loop");
-    for (var viewButton:number = 1; viewButton <= 4; viewButton++) {//4 buttons
-      console.log("Inside outer For Loop");
-      await browser.wait(EC.visibilityOf(requestPage.getRowViewButton(viewButton)),20000,'Row '+viewButton+' View Button did not appear')
-      await requestPage.getRowViewButton(viewButton).click();
-      console.log('View Report Button Clicked');
-      await browser.sleep(10000);
-
-      await requestPage.doRowComparison("Location Comparison");//28 rows, 35 elements for comparison
-      await browser.sleep(10000);
-      await requestPage.doRowComparison("USPS Comparison");//32 rows, 4 elements for comparison
-      await browser.sleep(10000);
-      await requestPage.doRowComparison("Zip Comparison");//28 rows, 56 elements for comparison
-      await browser.sleep(10000);
-
-      await browser.wait(EC.visibilityOf(element(by.tagName("b"))),10000,'Back to My reports did not appear');
-      await element(by.tagName("b")).click();
-      await browser.sleep(5000);
-    }
 */
-  // Export to Excel test scenario
-/*
-  await browser.wait(EC.visibilityOf(requestPage.getRowViewButton(1)),20000,'Row '+1+' View Button did not appear')
-  await requestPage.getRowViewButton(1).click();
-  console.log('View Report Button Clicked');
-  await browser.sleep(10000);
-  await browser.wait(EC.visibilityOf(element(by.xpath("//a[@id='export']"))),20000,'Row '+1+' Export to Excel option did not appear')
-  await element(by.xpath("//a[@id='export']")).click();
+});
+
+// Create New Report scenario
+When('Login to the LSSI Data Compare Application with {string} and {string} and test Create New Report', {timeout: 90 * 450000} , async (Username:string, Password:string)=> {
+  console.log("******** Validating Create New Report scenario ********");
+  await browser.waitForAngularEnabled(false);
+  await browser.driver.get("https://devsso.secure.fedex.com/L1/eShipmentGUI");
+  console.log('Navigated to Login Page');
+  browser.driver.manage().window().maximize();
+  await page.login(Username,Password)
   await browser.sleep(5000);
-  await browser.wait(EC.visibilityOf(element(by.tagName("b"))),10000,'Back to My reports did not appear');
-  await element(by.tagName("b")).click();
-*/
-  // Create New Report test scenario
-// await browser.sleep(10000);
 
-// await requestPage.createNewReport("Production", "FNL", "L3", "INT", "cancel");
-// await requestPage.createNewReport("L2", "FNL", "L3", "INT", "cancel");
-// await requestPage.createNewReport("L3", "FNL", "Production", "INT", "cancel");
-// await requestPage.createNewReport("L3", "FNL", "L2", "INT", "cancel");
+  await page.utilService.waitForUrlChange("https://devsso.secure.fedex.com/L1/eShipmentGUI/MenuPage.iface");
+  await browser.sleep(5000);
+
+  browser.wait(EC.visibilityOf(requestPage.getAllApp()),50000,'all app button did not appear')
+
+  await browser.actions().mouseMove(requestPage.getAllApp()).perform()
+  await browser.sleep(1000);
+  await browser.actions().mouseMove(requestPage.getScans()).perform()
+  await browser.sleep(1000);
+  await browser.actions().mouseMove(requestPage.getAllApp()).perform()
+
+  //Verify whether User is Allowed to access LSSI Data Compare Application
+  let msgFlag = await requestPage.getAllAppLSSIDataCompare().isPresent();
+  // console.log("return value: "+msgFlag);
+  if (!msgFlag){
+    console.log("The user ID: "+Username+" is NOT Allowed to access LSSI Data Compare application as expected");
+    return process.exit(1);
+  } else {
+    console.log("The user ID: "+Username+" is ALLOWED to access LSSI Data Compare application as expected");
+    browser.wait(EC.visibilityOf(requestPage.getAllAppLSSIDataCompare()),50000,'LSSI value did not appear')
+    await requestPage.getAllAppLSSIDataCompare().click();
+    console.log('Clicked on LSSI Data Compare Application');
+    await browser.sleep(10000);
+  }
+
+  // Checking load complete
+  await page.utilService.waitForUrlChange("https://devsso.secure.fedex.com/L1/eShipmentGUI/DisplayLinkHandler?id=4002");
+  expect(await queuepage.getURL()).to.equal(queuepage.actualURL);
+  await browser.sleep(2000);
+
+  // Enable the Angular property
+  await browser.waitForAngularEnabled();
+
+  // Switching the frame to actual application 
+  await browser.switchTo().frame(element(by.xpath("//frame[@src='https://devsso.secure.fedex.com/ursaCompare/']")).getWebElement());
+
+// Create New Report test scenario
+  await browser.sleep(10000);
+
+  await requestPage.createNewReport("L3", "FNL", "L2", "FNL", "cancel");
 
 // await requestPage.createNewReport("L3", "INT", "L3", "FNL", "create");
-// await requestPage.createNewReport("L2", "FNL", "L3", "FNL", "create");
-// await requestPage.createNewReport("L2", "FNL", "L3", "INT", "create");
-// await requestPage.createNewReport("L2", "INT", "L3", "FNL", "create");
-// await requestPage.createNewReport("L2", "INT", "L3", "INT", "create");
 
-// await browser.sleep(10000);
+});
+
+// step definations for Export to Excel test scenario
+When('Test Export to Excel functionality', {timeout: 90 * 450000} , async ()=> {
+  console.log("******** Validating Export to Excel functionality ********");
+  await browser.wait(EC.visibilityOf(requestPage.getRowViewButton(1)),50000,'Row '+1+' View Button did not appear')
+  await requestPage.getRowViewButton(1).click();
+  console.log('View Report Button Clicked');
+  await browser.sleep(30000);
+  // await browser.wait(EC.visibilityOf(element(by.xpath("/html/body/app-root/app-layout/div/div/div[2]/app-version-comparison/div[2]/span/a"))),50000,'Row '+1+' Export to Excel option did not appear')
+  // await element(by.xpath("/html/body/app-root/app-layout/div/div/div[2]/app-version-comparison/div[2]/span/a")).click();
+  // await browser.wait(EC.visibilityOf(element(by.xpath("//a[@id='export']"))),50000,'Row '+1+' Export to Excel option did not appear')
+  // await element(by.xpath("//a[@id='export']")).click();
+  await browser.actions().mouseMove(element(by.xpath("//a[@id='export']"))).perform()
+  await element(by.xpath("//a[@id='export']")).click();
+  await browser.sleep(20000);
+  console.log('Export to Excel Successful');
+  await browser.wait(EC.visibilityOf(element(by.tagName("b"))),50000,'Back to My reports did not appear');
+  await element(by.tagName("b")).click();
+  await browser.sleep(20000);
+});
+
+// step definations for View report functionality
+When('Test View Report functionality', {timeout: 90 * 450000} , async ()=> {
+  console.log("******** Validating View Report functionality ********");
+
+  // var row = element.all(by.xpath('.//*[@class="ui-table-tbody"]'));
+  // var value = row.all(by.tagName("tr"));
+  // value.count().then(function(rowCount){
+  //   console.log("Row count: "+rowCount);
+  // })
+  await browser.sleep(8000)
+  console.log("Just before outer For Loop");
+  for (var viewButton:number = 1; viewButton <= 1; viewButton++) {//For 1 button, demo purpose
+    console.log("Inside outer For Loop");
+    await browser.wait(EC.visibilityOf(requestPage.getRowViewButton(viewButton)),50000,'Row '+viewButton+' View Button did not appear')
+    await requestPage.getRowViewButton(viewButton).click();
+    console.log('View Report Button Clicked');
+    await browser.sleep(30000);
+
+    await requestPage.doRowComparison("Location Comparison");//28 rows, 35 elements for comparison
+    await browser.sleep(10000);
+    await requestPage.doRowComparison("USPS Comparison");//32 rows, 4 elements for comparison
+    await browser.sleep(10000);
+    await requestPage.doRowComparison("Zip Comparison");//28 rows, 56 elements for comparison
+    await browser.sleep(10000);
+
+    await browser.wait(EC.visibilityOf(element(by.tagName("b"))),50000,'Back to My reports did not appear');
+    await element(by.tagName("b")).click();
+    await browser.sleep(5000);
+  }
+
+  browser.sleep(5000);
+
+  // Switching the frame to Header
+  // await browser.switchTo().frame(element(by.xpath("//frame[@src='DisplayLinkHeader.jsp?id=4002']")).getWebElement());
+
+  //Verifying the Logout functionality is working as expected
+  // await browser.wait(EC.visibilityOf(element(by.linkText("Logout"))),50000,'Logout did not appeared')
+  // await element(by.linkText("Logout")).click();
+  // browser.sleep(5000);
+  // console.log('User Logged out successfully');
+
+  await browser.sleep(10000);
+});
+
+// Verifying invalid credentials
+When('Login to the Eops with invalid credentials {string} and {string}', {timeout: 90 * 450000} , async (Username:string, Password:string)=> {
+  console.log("******** Validating Login with invalid credentials scenario ********");
+  await browser.waitForAngularEnabled(false);
+  console.log(Username);
+  console.log(Password);
+  await browser.driver.get("http://ursa-ui-dev.app.wtcdev1.paas.fedex.com/ursaCompare/");
+  console.log('Navigated to Login Page');
+  browser.driver.manage().window().maximize();
+  await page.login(Username,Password)
+  await browser.sleep(5000);
+
+  await page.utilService.waitForUrlChange("https://devsso.secure.fedex.com/L1/eShipmentGUI/MenuPage.iface");
+  await browser.sleep(5000);
+
+  browser.wait(EC.visibilityOf(requestPage.getAllApp()),2000,'all app button did not appear')
+
+  await browser.actions().mouseMove(requestPage.getAllApp()).perform()
+  await browser.sleep(1000);
+  await browser.actions().mouseMove(requestPage.getScans()).perform()
+  await browser.sleep(1000);
+  await browser.actions().mouseMove(requestPage.getAllApp()).perform()
+
+  //Verify whether User is Allowed to access LSSI Data Compare Application
+  let msgFlag = await requestPage.getAllAppLSSIDataCompare().isPresent();
+  // console.log("return value: "+msgFlag);
+  if (!msgFlag){
+    console.log("The user ID: "+Username+" is NOT Allowed to access LSSI Data Compare application as expected");
+  } 
+  browser.sleep(5000);
+
+  // Switching the frame to Header
+  await browser.switchTo().frame(element(by.xpath("//iframe[@src='DisplayLinkHeader.jsp?id=0']")).getWebElement());
+  browser.sleep(5000);
+
+  //Verifying the Logout functionality is working as expected
+  await browser.wait(EC.visibilityOf(element(by.linkText("Logout"))),20000,'Logout did not appeared')
+  await element(by.linkText("Logout")).click();
+  browser.sleep(5000);
+  console.log('User Logged out successfully');
 
 });
 
