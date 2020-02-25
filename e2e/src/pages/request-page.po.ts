@@ -159,13 +159,19 @@ export class RequestPage {
       let msgFlag = await element(by.xpath("/html/body/app-root/app-layout/div/div/div[2]/app-version-comparison/div[2]/span")).isPresent();
       if (msgFlag){
         let str1 = await element(by.xpath("/html/body/app-root/app-layout/div/div/div[2]/app-version-comparison/div[2]/span")).getText();
-        console.log("As expected found message: "+str1);
+        let str2 = "Note: Displaying previously saved report for the selected URSA versions."
+        if (str1 == str2){
+          console.log("As expected found message: "+str1);
+        } else {
+          console.log("The message found is not as expected: "+str1);
+        }
         await browser.wait(EC.visibilityOf(element(by.tagName("b"))),10000,'Back to My reports did not appear');
         await element(by.tagName("b")).click();
-      } else {
-        await browser.wait(browser.ExpectedConditions.visibilityOf(this.saveReport()),10000,'Save Report button did not appear');				
-        await this.saveReport().click();
-      }
+      } // Save Report option is removed. Hence below code snippet is not required
+      // } else {
+      //   await browser.wait(browser.ExpectedConditions.visibilityOf(this.saveReport()),10000,'Save Report button did not appear');				
+      //   await this.saveReport().click();
+      // }
     } else {
       await browser.sleep(1000);
       await browser.wait(EC.visibilityOf(element(by.xpath("//button[@id='cancel']"))),20000,'Row '+1+' Create New Report button did not appear')

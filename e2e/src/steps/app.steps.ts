@@ -46,7 +46,7 @@ Given('Login to the Eops with {string} and {string} and Select the LSSI Data Com
     browser.driver.manage().window().maximize();
     await page.login(Username,Password)
     await browser.sleep(5000);
-  /*
+  
     await page.utilService.waitForUrlChange("https://devsso.secure.fedex.com/L1/eShipmentGUI/MenuPage.iface");
     await browser.sleep(5000);
   
@@ -100,7 +100,7 @@ Given('Login to the Eops with {string} and {string} and Select the LSSI Data Com
     await element(by.linkText("Logout")).click();
     browser.sleep(5000);
     console.log('User Logged out successfully');
-*/
+
 });
 
 // Create New Report scenario
@@ -152,9 +152,8 @@ When('Login to the LSSI Data Compare Application with {string} and {string} and 
 // Create New Report test scenario
   await browser.sleep(10000);
 
-  await requestPage.createNewReport("L3", "FNL", "L2", "FNL", "cancel");
-
-// await requestPage.createNewReport("L3", "INT", "L3", "FNL", "create");
+  // await requestPage.createNewReport("L3", "FNL", "L2", "FNL", "cancel");
+  await requestPage.createNewReport("L3", "INT", "L3", "FNL", "create");
 
 });
 
